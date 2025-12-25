@@ -19,7 +19,7 @@ async function createNestServer(expressInstance: express.Express) {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   // Global prefix
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/web/v1');
 
   // Enable CORS
   app.enableCors({
@@ -46,6 +46,8 @@ async function createNestServer(expressInstance: express.Express) {
     .setVersion('1.0')
     .addTag('auth', 'Authentication endpoints')
     .addTag('health', 'Health check endpoints')
+    .addTag('organizations', 'Organization endpoints')
+    .addTag('subscription-plans', 'Subscription plan endpoints')
     .addBearerAuth()
     .build();
 
