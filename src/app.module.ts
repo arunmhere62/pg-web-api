@@ -8,11 +8,15 @@ import { SubscriptionPlansModule } from './subscription-plans/subscription-plans
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { RolePermissionsModule } from './role-permissions/role-permissions.module';
+import { AuthModule } from './auth/auth.module';
+import { LegalDocumentsModule } from './legal-documents/legal-documents.module';
 
 @Module({
   imports: [
     PrismaModule,
     S3Module,
+    AuthModule,
+    LegalDocumentsModule,
     OrganizationsModule,
     SubscriptionPlansModule,
     PermissionsModule,

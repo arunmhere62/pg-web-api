@@ -9,8 +9,71 @@ datasource db {
   url      = env("DATABASE_MANAGEMENT_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model otp_attempt {
+  s_no             Int         @id @default(autoincrement())
+  otp_request_s_no Int
+  user_s_no        Int?
+  identifier       String      @db.VarChar(255)
+  purpose          String      @db.VarChar(50)
+  succeeded        Boolean
+  ip_address       String?     @db.VarChar(45)
+  user_agent       String?     @db.VarChar(255)
+  created_at       DateTime    @default(now()) @db.DateTime(0)
+  otp_request      otp_request @relation(fields: [otp_request_s_no], references: [s_no], onDelete: Cascade)
+  user             user?       @relation(fields: [user_s_no], references: [s_no])
+
+  @@index([identifier, purpose])
+  @@index([otp_request_s_no])
+  @@index([user_s_no])
+}
+
+model otp_request {
+  s_no            Int           @id @default(autoincrement())
+  user_s_no       Int?
+  identifier      String        @db.VarChar(255)
+  channel         String        @db.VarChar(50)
+  purpose         String        @db.VarChar(50)
+  otp_hash        String        @db.VarChar(255)
+  expires_at      DateTime      @db.DateTime(0)
+  consumed_at     DateTime?     @db.DateTime(0)
+  max_attempts    Int           @default(5)
+  attempt_count   Int           @default(0)
+  last_attempt_at DateTime?     @db.DateTime(0)
+  ip_address      String?       @db.VarChar(45)
+  user_agent      String?       @db.VarChar(255)
+  created_at      DateTime      @default(now()) @db.DateTime(0)
+  otp_attempt     otp_attempt[]
+  user            user?         @relation(fields: [user_s_no], references: [s_no])
+
+  @@index([expires_at])
+  @@index([identifier, purpose])
+  @@index([user_s_no])
+}
+
+model session {
+  s_no               Int       @id @default(autoincrement())
+  user_s_no          Int
+  refresh_token_hash String    @db.VarChar(255)
+  created_at         DateTime  @default(now()) @db.DateTime(0)
+  expires_at         DateTime  @db.DateTime(0)
+  revoked_at         DateTime? @db.DateTime(0)
+  ip_address         String?   @db.VarChar(45)
+  user_agent         String?   @db.VarChar(255)
+  user               user      @relation(fields: [user_s_no], references: [s_no], onDelete: Cascade)
+
+  @@index([expires_at])
+  @@index([user_s_no])
+}
+
+model user {
+  s_no        Int           @id @default(autoincrement())
+  email       String?       @unique @db.VarChar(255)
+  phone       String?       @unique @db.VarChar(32)
+  name        String?       @db.VarChar(255)
+  is_active   Boolean       @default(true)
+  created_at  DateTime      @default(now()) @db.DateTime(0)
+  updated_at  DateTime      @default(now()) @db.DateTime(0)
+  otp_attempt otp_attempt[]
+  otp_request otp_request[]
+  session     session[]
 }

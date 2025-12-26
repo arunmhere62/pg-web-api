@@ -3,6 +3,7 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { BulkUpsertPermissionsDto } from './dto/bulk-permissions.dto';
 
 @ApiTags('permissions')
 @Controller('permissions')
@@ -30,6 +31,13 @@ export class PermissionsController {
   @ApiResponse({ status: 201, description: 'Permission created successfully' })
   create(@Body() dto: CreatePermissionDto) {
     return this.service.create(dto);
+  }
+
+  @Post('bulk')
+  @ApiOperation({ summary: 'Bulk upsert permissions for a screen' })
+  @ApiResponse({ status: 200, description: 'Permissions upserted successfully' })
+  bulkUpsert(@Body() dto: BulkUpsertPermissionsDto) {
+    return this.service.bulkUpsert(dto);
   }
 
   @Patch(':id')
