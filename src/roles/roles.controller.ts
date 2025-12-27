@@ -1,11 +1,15 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
 
 @ApiTags('roles')
 @Controller('roles')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class RolesController {
   constructor(private readonly service: RolesService) {}
 

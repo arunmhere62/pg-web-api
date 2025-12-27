@@ -9,14 +9,19 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionPlansService } from './subscription-plans.service';
 import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
 
 @ApiTags('subscription-plans')
 @Controller('subscription-plans')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class SubscriptionPlansController {
   constructor(private readonly service: SubscriptionPlansService) {}
 

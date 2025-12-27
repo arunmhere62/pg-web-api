@@ -1,11 +1,16 @@
-import { Body, Controller, Headers, Patch, Post, Query, Get, Param, ParseBoolPipe, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Patch, Post, Query, Get, Param, ParseBoolPipe, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateLegalDocumentDto } from './dto/create-legal-document.dto';
 import { UpdateLegalDocumentDto } from './dto/update-legal-document.dto';
 import { LegalDocumentsService } from './legal-documents.service';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
+import { ValidatedHeaders } from '../common/decorators/validated-headers.decorator';
 
 @ApiTags('legal-documents')
 @Controller('legal-documents')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class LegalDocumentsController {
   constructor(private readonly service: LegalDocumentsService) {}
 
@@ -48,9 +53,8 @@ export class LegalDocumentsController {
   @Post()
   @ApiOperation({ summary: 'Create legal document' })
   @ApiResponse({ status: 201, description: 'Legal document created successfully' })
-  create(@Body() dto: CreateLegalDocumentDto, @Headers('x-user-id') xUserId?: string) {
-    const createdBy = xUserId ? parseInt(xUserId, 10) : undefined;
-    return this.service.create(dto, createdBy);
+  create(@Body() dto: CreateLegalDocumentDto, @ValidatedHeaders() headers: { user_id?: number }) {
+    return this.service.create(dto, headers.user_id);
   }
 
   @Patch(':id')
@@ -60,10 +64,9 @@ export class LegalDocumentsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLegalDocumentDto,
-    @Headers('x-user-id') xUserId?: string,
+    @ValidatedHeaders() headers: { user_id?: number },
   ) {
-    const updatedBy = xUserId ? parseInt(xUserId, 10) : undefined;
-    return this.service.update(id, dto, updatedBy);
+    return this.service.update(id, dto, headers.user_id);
   }
 
   @Patch(':id/active')
@@ -74,9 +77,8 @@ export class LegalDocumentsController {
   setActive(
     @Param('id', ParseIntPipe) id: number,
     @Query('value', ParseBoolPipe) value: boolean,
-    @Headers('x-user-id') xUserId?: string,
+    @ValidatedHeaders() headers: { user_id?: number },
   ) {
-    const updatedBy = xUserId ? parseInt(xUserId, 10) : undefined;
-    return this.service.setActive(id, value, updatedBy);
+    return this.service.setActive(id, value, headers.user_id);
   }
 }

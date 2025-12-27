@@ -8,6 +8,15 @@ import { UpdateLegalDocumentDto } from './dto/update-legal-document.dto';
 export class LegalDocumentsService {
   constructor(private readonly consumerPrisma: ConsumerPrismaService) {}
 
+  private async ensureUserIdExists(userId?: number): Promise<number | undefined> {
+    if (!Number.isFinite(userId)) return undefined;
+    const existing = await this.consumerPrisma.users.findUnique({
+      where: { s_no: userId },
+      select: { s_no: true },
+    });
+    return existing?.s_no;
+  }
+
   async list(params: {
     page: number;
     limit: number;
@@ -39,6 +48,7 @@ export class LegalDocumentsService {
   }
 
   async create(dto: CreateLegalDocumentDto, createdBy?: number) {
+    const validCreatedBy = await this.ensureUserIdExists(createdBy);
     const exists = await this.consumerPrisma.legal_documents.findFirst({
       where: {
         type: dto.type,
@@ -62,8 +72,8 @@ export class LegalDocumentsService {
         effective_date: dto.effective_date ? new Date(dto.effective_date) : new Date(),
         expiry_date: dto.expiry_date ? new Date(dto.expiry_date) : null,
         organization_id: dto.organization_id ?? null,
-        created_by: createdBy ?? null,
-        updated_by: createdBy ?? null,
+        created_by: validCreatedBy,
+        updated_by: validCreatedBy,
       },
     });
 
@@ -71,6 +81,7 @@ export class LegalDocumentsService {
   }
 
   async update(id: number, dto: UpdateLegalDocumentDto, updatedBy?: number) {
+    const validUpdatedBy = await this.ensureUserIdExists(updatedBy);
     const existing = await this.consumerPrisma.legal_documents.findUnique({
       where: { s_no: id },
     });
@@ -106,7 +117,7 @@ export class LegalDocumentsService {
         effective_date: dto.effective_date ? new Date(dto.effective_date) : undefined,
         expiry_date: dto.expiry_date === null ? null : dto.expiry_date ? new Date(dto.expiry_date) : undefined,
         organization_id: dto.organization_id,
-        updated_by: updatedBy ?? null,
+        updated_by: validUpdatedBy,
         updated_at: new Date(),
       },
     });
@@ -115,6 +126,7 @@ export class LegalDocumentsService {
   }
 
   async setActive(id: number, value: boolean, updatedBy?: number) {
+    const validUpdatedBy = await this.ensureUserIdExists(updatedBy);
     const existing = await this.consumerPrisma.legal_documents.findUnique({
       where: { s_no: id },
     });
@@ -127,7 +139,7 @@ export class LegalDocumentsService {
       where: { s_no: id },
       data: {
         is_active: value,
-        updated_by: updatedBy ?? null,
+        updated_by: validUpdatedBy,
         updated_at: new Date(),
       },
     });

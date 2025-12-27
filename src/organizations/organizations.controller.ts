@@ -1,9 +1,13 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OrganizationsService } from './organizations.service';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
 
 @ApiTags('organizations')
 @Controller('organizations')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
 

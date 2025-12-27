@@ -9,13 +9,18 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RolePermissionsService } from './role-permissions.service';
 import { AssignPermissionsDto, BulkPermissionUpdateDto } from './dto/assign-permissions.dto';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
 
 @ApiTags('role-permissions')
 @Controller('role-permissions')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class RolePermissionsController {
   constructor(private readonly service: RolePermissionsService) {}
 

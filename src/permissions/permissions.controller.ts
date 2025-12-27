@@ -1,12 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { BulkUpsertPermissionsDto } from './dto/bulk-permissions.dto';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
 
 @ApiTags('permissions')
 @Controller('permissions')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class PermissionsController {
   constructor(private readonly service: PermissionsService) {}
 

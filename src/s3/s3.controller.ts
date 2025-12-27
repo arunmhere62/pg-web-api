@@ -1,9 +1,13 @@
-import { Controller, Post, Delete, Get, Body, Query } from '@nestjs/common';
+import { Controller, Post, Delete, Get, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { S3Service } from './s3.service';
+import { HeadersValidationGuard } from '../common/guards/headers-validation.guard';
+import { RequireHeaders } from '../common/decorators/require-headers.decorator';
 
 @ApiTags('s3')
 @Controller('s3')
+@UseGuards(HeadersValidationGuard)
+@RequireHeaders({ user_id: true })
 export class S3Controller {
   constructor(private readonly s3Service: S3Service) {}
 
