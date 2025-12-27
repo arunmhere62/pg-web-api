@@ -10,6 +10,7 @@ import { RolesModule } from './roles/roles.module';
 import { RolePermissionsModule } from './role-permissions/role-permissions.module';
 import { AuthModule } from './auth/auth.module';
 import { LegalDocumentsModule } from './legal-documents/legal-documents.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LegalDocumentsModule } from './legal-documents/legal-documents.module';
     S3Module,
     AuthModule,
     LegalDocumentsModule,
+    TicketsModule,
     OrganizationsModule,
     SubscriptionPlansModule,
     PermissionsModule,

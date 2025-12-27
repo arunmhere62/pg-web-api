@@ -1,9 +1,18 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client-consumer';
 
+const globalForConsumerPrisma = global as unknown as {
+  consumerPrisma?: ConsumerPrismaService;
+};
+
 @Injectable()
 export class ConsumerPrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
+    const existing = globalForConsumerPrisma.consumerPrisma;
+    if (existing) {
+      return existing;
+    }
+
     super({
       datasources: {
         db: {
@@ -12,6 +21,10 @@ export class ConsumerPrismaService extends PrismaClient implements OnModuleInit,
       },
       log: ['query', 'info', 'warn', 'error'],
     });
+
+    if (process.env.NODE_ENV !== 'production') {
+      globalForConsumerPrisma.consumerPrisma = this;
+    }
   }
 
   async onModuleInit() {

@@ -84,6 +84,8 @@ class TransformInterceptor implements NestInterceptor {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableShutdownHooks();
+
   // Payload size limit for image uploads (50MB - images are compressed on frontend)
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
