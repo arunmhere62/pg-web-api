@@ -1,5 +1,6 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client-consumer';
+import { addDbTiming } from '../common/utils/performance-context';
 
 const globalForConsumerPrisma = global as unknown as {
   consumerPrisma?: ConsumerPrismaService;
@@ -20,6 +21,15 @@ export class ConsumerPrismaService extends PrismaClient implements OnModuleInit,
         },
       },
       log: ['query', 'info', 'warn', 'error'],
+    });
+
+    this.$use(async (params, next) => {
+      const start = process.hrtime.bigint();
+      const result = await next(params);
+      const end = process.hrtime.bigint();
+      const ms = Number(end - start) / 1_000_000;
+      addDbTiming(ms);
+      return result;
     });
 
     if (process.env.NODE_ENV !== 'production') {

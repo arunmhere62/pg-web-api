@@ -29,6 +29,7 @@ export class ApiResponseDto<T = any> implements ApiResponse<T> {
     data?: T,
     error?: { code: string; details?: any },
     path?: string,
+    meta?: any,
   ) {
     this.statusCode = statusCode;
     this.message = message;
@@ -36,6 +37,10 @@ export class ApiResponseDto<T = any> implements ApiResponse<T> {
     this.error = error;
     this.timestamp = new Date().toISOString();
     this.path = path;
+
+    if (meta !== undefined) {
+      this['meta'] = meta;
+    }
 
     if (data !== undefined && data !== null) {
       this['data'] = data;
