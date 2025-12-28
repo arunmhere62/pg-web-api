@@ -12,7 +12,7 @@ export class AppService {
 
   getHealth(): object {
     return {
-      status: 'ok',
+      status: 'ok Its Running',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
     };
