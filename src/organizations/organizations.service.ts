@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConsumerPrismaService } from '../prisma/consumer-prisma.service';
 import { ResponseUtil } from '../common/utils/response.util';
+import { Prisma } from '@prisma/client-consumer';
 
 interface ListOrganizationsParams {
   page: number;
@@ -60,17 +61,24 @@ export class OrganizationsService {
 
     const [employeesGrouped, tenantsGrouped] = await Promise.all([
       pgIds.length
-        ? this.consumerPrisma.$queryRawUnsafe<
-            Array<{ pg_id: number | null; _count: number }>
-          >(
-            `SELECT pg_id, COUNT(*) as _count FROM users WHERE is_deleted = 0 AND pg_id IN (${pgIds.join(',')}) GROUP BY pg_id`
+        ? this.consumerPrisma.$queryRaw<Array<{ pg_id: number | null; _count: number }>>(
+            Prisma.sql`
+              SELECT pu.pg_id AS pg_id, CAST(COUNT(*) AS UNSIGNED) AS _count
+              FROM pg_users pu
+              INNER JOIN users u ON u.s_no = pu.user_id
+              WHERE u.is_deleted = 0 AND pu.pg_id IN (${Prisma.join(pgIds)})
+              GROUP BY pu.pg_id
+            `
           )
         : Promise.resolve([] as Array<{ pg_id: number | null; _count: number }>),
       pgIds.length
-        ? this.consumerPrisma.$queryRawUnsafe<
-            Array<{ pg_id: number | null; _count: number }>
-          >(
-            `SELECT pg_id, COUNT(*) as _count FROM tenants WHERE is_deleted = 0 AND pg_id IN (${pgIds.join(',')}) GROUP BY pg_id`
+        ? this.consumerPrisma.$queryRaw<Array<{ pg_id: number | null; _count: number }>>(
+            Prisma.sql`
+              SELECT t.pg_id AS pg_id, CAST(COUNT(*) AS UNSIGNED) AS _count
+              FROM tenants t
+              WHERE t.is_deleted = 0 AND t.pg_id IN (${Prisma.join(pgIds)})
+              GROUP BY t.pg_id
+            `
           )
         : Promise.resolve([] as Array<{ pg_id: number | null; _count: number }>),
     ]);
@@ -78,14 +86,14 @@ export class OrganizationsService {
     const employeesByPgId = new Map<number, number>();
     for (const row of employeesGrouped) {
       if (row.pg_id != null) {
-        employeesByPgId.set(row.pg_id, row._count ?? 0);
+        employeesByPgId.set(row.pg_id, Number(row._count ?? 0));
       }
     }
 
     const tenantsByPgId = new Map<number, number>();
     for (const row of tenantsGrouped) {
       if (row.pg_id != null) {
-        tenantsByPgId.set(row.pg_id, row._count ?? 0);
+        tenantsByPgId.set(row.pg_id, Number(row._count ?? 0));
       }
     }
 
@@ -183,17 +191,24 @@ export class OrganizationsService {
 
     const [employeesGrouped, tenantsGrouped] = await Promise.all([
       pgIds.length
-        ? this.consumerPrisma.$queryRawUnsafe<
-            Array<{ pg_id: number | null; _count: number }>
-          >(
-            `SELECT pg_id, COUNT(*) as _count FROM users WHERE is_deleted = 0 AND pg_id IN (${pgIds.join(',')}) GROUP BY pg_id`
+        ? this.consumerPrisma.$queryRaw<Array<{ pg_id: number | null; _count: number }>>(
+            Prisma.sql`
+              SELECT pu.pg_id AS pg_id, CAST(COUNT(*) AS UNSIGNED) AS _count
+              FROM pg_users pu
+              INNER JOIN users u ON u.s_no = pu.user_id
+              WHERE u.is_deleted = 0 AND pu.pg_id IN (${Prisma.join(pgIds)})
+              GROUP BY pu.pg_id
+            `
           )
         : Promise.resolve([] as Array<{ pg_id: number | null; _count: number }>),
       pgIds.length
-        ? this.consumerPrisma.$queryRawUnsafe<
-            Array<{ pg_id: number | null; _count: number }>
-          >(
-            `SELECT pg_id, COUNT(*) as _count FROM tenants WHERE is_deleted = 0 AND pg_id IN (${pgIds.join(',')}) GROUP BY pg_id`
+        ? this.consumerPrisma.$queryRaw<Array<{ pg_id: number | null; _count: number }>>(
+            Prisma.sql`
+              SELECT t.pg_id AS pg_id, CAST(COUNT(*) AS UNSIGNED) AS _count
+              FROM tenants t
+              WHERE t.is_deleted = 0 AND t.pg_id IN (${Prisma.join(pgIds)})
+              GROUP BY t.pg_id
+            `
           )
         : Promise.resolve([] as Array<{ pg_id: number | null; _count: number }>),
     ]);
@@ -201,14 +216,14 @@ export class OrganizationsService {
     const employeesByPgId = new Map<number, number>();
     for (const row of employeesGrouped) {
       if (row.pg_id != null) {
-        employeesByPgId.set(row.pg_id, row._count ?? 0);
+        employeesByPgId.set(row.pg_id, Number(row._count ?? 0));
       }
     }
 
     const tenantsByPgId = new Map<number, number>();
     for (const row of tenantsGrouped) {
       if (row.pg_id != null) {
-        tenantsByPgId.set(row.pg_id, row._count ?? 0);
+        tenantsByPgId.set(row.pg_id, Number(row._count ?? 0));
       }
     }
 
