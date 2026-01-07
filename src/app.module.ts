@@ -11,9 +11,14 @@ import { RolePermissionsModule } from './role-permissions/role-permissions.modul
 import { AuthModule } from './auth/auth.module';
 import { LegalDocumentsModule } from './legal-documents/legal-documents.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     PrismaModule,
     S3Module,
     AuthModule,

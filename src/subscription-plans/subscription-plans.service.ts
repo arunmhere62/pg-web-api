@@ -9,24 +9,32 @@ export class SubscriptionPlansService {
   constructor(private readonly consumerPrisma: ConsumerPrismaService) {}
 
   async create(dto: CreateSubscriptionPlanDto) {
+    const data = {
+      name: dto.name,
+      description: dto.description,
+      duration: dto.duration,
+      price: dto.price as any,
+      currency: dto.currency,
+      features: dto.features as any,
+      max_pg_locations: dto.max_pg_locations,
+      max_tenants: dto.max_tenants,
+      max_rooms: dto.max_rooms,
+      max_beds: dto.max_beds,
+      max_employees: dto.max_employees,
+      max_users: dto.max_users,
+      max_invoices_per_month: dto.max_invoices_per_month,
+      max_sms_per_month: dto.max_sms_per_month,
+      max_whatsapp_per_month: dto.max_whatsapp_per_month,
+      is_free: dto.is_free ?? false,
+      is_trial: dto.is_trial ?? false,
+      is_active: dto.is_active ?? true,
+    };
+
     const plan = await this.consumerPrisma.subscription_plans.create({
       data: {
-        name: dto.name,
-        description: dto.description,
-        duration: dto.duration,
-        price: dto.price as any,
-        currency: dto.currency,
-        features: dto.features as any,
-        max_pg_locations: dto.max_pg_locations,
-        max_tenants: dto.max_tenants,
-        max_rooms: dto.max_rooms,
-        max_beds: dto.max_beds,
-        max_employees: dto.max_employees,
-        max_users: dto.max_users,
-        max_invoices_per_month: dto.max_invoices_per_month,
-        max_sms_per_month: dto.max_sms_per_month,
-        max_whatsapp_per_month: dto.max_whatsapp_per_month,
-        is_active: dto.is_active ?? true,
+        ...(data as unknown as Parameters<
+          ConsumerPrismaService['subscription_plans']['create']
+        >[0]['data']),
       },
     });
 
@@ -77,26 +85,34 @@ export class SubscriptionPlansService {
       throw new NotFoundException('Subscription plan not found');
     }
 
+    const data = {
+      name: dto.name,
+      description: dto.description,
+      duration: dto.duration,
+      price: dto.price as any,
+      currency: dto.currency,
+      features: dto.features as any,
+      max_pg_locations: dto.max_pg_locations,
+      max_tenants: dto.max_tenants,
+      max_rooms: dto.max_rooms,
+      max_beds: dto.max_beds,
+      max_employees: dto.max_employees,
+      max_users: dto.max_users,
+      max_invoices_per_month: dto.max_invoices_per_month,
+      max_sms_per_month: dto.max_sms_per_month,
+      max_whatsapp_per_month: dto.max_whatsapp_per_month,
+      is_free: dto.is_free,
+      is_trial: dto.is_trial,
+      is_active: dto.is_active,
+      updated_at: new Date(),
+    };
+
     const updated = await this.consumerPrisma.subscription_plans.update({
       where: { s_no: id },
       data: {
-        name: dto.name,
-        description: dto.description,
-        duration: dto.duration,
-        price: dto.price as any,
-        currency: dto.currency,
-        features: dto.features as any,
-        max_pg_locations: dto.max_pg_locations,
-        max_tenants: dto.max_tenants,
-        max_rooms: dto.max_rooms,
-        max_beds: dto.max_beds,
-        max_employees: dto.max_employees,
-        max_users: dto.max_users,
-        max_invoices_per_month: dto.max_invoices_per_month,
-        max_sms_per_month: dto.max_sms_per_month,
-        max_whatsapp_per_month: dto.max_whatsapp_per_month,
-        is_active: dto.is_active,
-        updated_at: new Date(),
+        ...(data as unknown as Parameters<
+          ConsumerPrismaService['subscription_plans']['update']
+        >[0]['data']),
       },
     });
 

@@ -104,4 +104,14 @@ export class CreateSubscriptionPlanDto {
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
+
+  @ApiPropertyOptional({ example: false, description: 'Marks plan as free plan' })
+  @IsOptional()
+  @IsBoolean()
+  is_free?: boolean;
+
+  @ApiPropertyOptional({ example: false, description: 'Marks plan as trial plan (auto-assigned at signup)' })
+  @IsOptional()
+  @IsBoolean()
+  is_trial?: boolean;
 }
