@@ -3,6 +3,7 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsObject,
@@ -11,6 +12,8 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+
+const ALLOWED_DURATIONS_DAYS = [30, 180, 365] as const;
 
 export class CreateSubscriptionPlanDto {
   @ApiProperty({ example: 'Starter' })
@@ -23,9 +26,10 @@ export class CreateSubscriptionPlanDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 30, description: 'Duration in days' })
+  @ApiProperty({ example: 30, description: 'Duration in days (30 = 1 month, 180 = 6 months, 365 = 12 months)' })
   @IsInt()
   @Min(1)
+  @IsIn(ALLOWED_DURATIONS_DAYS)
   duration: number;
 
   @ApiProperty({ example: 999, description: 'Price amount' })
